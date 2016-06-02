@@ -1,0 +1,9 @@
+@import "/assets/styles-2.css";
+
+h1 {
+  color: #ff0000;
+}
+
+#header {
+  background-image: url(/assets/tile-1.jpg);
+}
