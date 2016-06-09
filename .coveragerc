@@ -3,4 +3,5 @@ branch = True
 source = http_crawler
 
 [report]
+fail_under = 100
 show_missing = True
