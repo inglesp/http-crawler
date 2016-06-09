@@ -19,7 +19,7 @@ if __name__ == '__main__':
     setup(
         name='http-crawler',
         version=VERSION,
-        description='A library for crawling web sites',
+        description='A library for crawling websites',
         long_description=read('README.rst'),
         packages=find_packages(where='src'),
         package_dir={'': 'src'},
