@@ -9,7 +9,7 @@ import tinycss
 __version__ = '0.1.0'
 
 
-def crawl(base_url):
+def crawl(base_url, follow_external_links=True):
     base_netloc = urlparse(base_url).netloc
 
     seen = set([base_url])
@@ -38,6 +38,11 @@ def crawl(base_url):
 
         for url1 in urls:
             abs_url = urljoin(url, url1)
+
+            if not follow_external_links:
+                if urlparse(abs_url).netloc != base_netloc:
+                    continue
+
             if abs_url not in seen:
                 seen.add(abs_url)
                 todo.append(abs_url)
