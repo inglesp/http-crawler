@@ -57,16 +57,11 @@ def extract_urls_from_css(css):
     urls = []
     rules = tinycss2.parse_stylesheet(css)
     for rule in rules:
-        if rule.type == 'at-rule':
-            if rule.lower_at_keyword == 'import':
-                for token in rule.prelude:
-                    if token.type in ['string', 'url']:
-                        urls.append(token.value)
-            elif rule.lower_at_keyword == 'font-face':
-                for token in rule.content:
-                    if token.type == 'url':
-                        urls.append(token.value)
-        elif rule.type == 'qualified-rule':
+        if rule.type == 'at-rule' and rule.lower_at_keyword == 'import':
+            for token in rule.prelude:
+                if token.type in ['string', 'url']:
+                    urls.append(token.value)
+        elif hasattr(rule, 'content'):
             for token in rule.content:
                 if token.type == 'url':
                     urls.append(token.value)
