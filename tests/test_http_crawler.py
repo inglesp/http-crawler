@@ -31,7 +31,7 @@ def test_crawl():
 
     rsps = list(http_crawler.crawl('http://localhost:8000/'))
 
-    assert len(rsps) == 11
+    assert len(rsps) == 13
 
     urls = [rsp.url for rsp in rsps]
 
@@ -47,6 +47,8 @@ def test_crawl():
         'http://localhost:8000/assets/script.js',
         'http://localhost:8000/assets/tile-1.jpg',
         'http://localhost:8000/assets/tile-2.jpg',
+        'http://localhost:8000/assets/somefont.eot',
+        'http://localhost:8000/assets/somefont.ttf',
         'http://localhost:8001/pages/page-1/',
     }
 
@@ -57,7 +59,7 @@ def test_crawl_follow_external_links_false():
     rsps = list(http_crawler.crawl('http://localhost:8000/',
                 follow_external_links=False))
 
-    assert len(rsps) == 10
+    assert len(rsps) == 12
 
     urls = [rsp.url for rsp in rsps]
 
@@ -73,6 +75,8 @@ def test_crawl_follow_external_links_false():
         'http://localhost:8000/assets/script.js',
         'http://localhost:8000/assets/tile-1.jpg',
         'http://localhost:8000/assets/tile-2.jpg',
+        'http://localhost:8000/assets/somefont.eot',
+        'http://localhost:8000/assets/somefont.ttf',
     }
 
 
@@ -101,8 +105,10 @@ def test_extract_urls_from_css():
 
     urls = http_crawler.extract_urls_from_css(content)
 
-    assert len(urls) == 2
+    assert len(urls) == 5
     assert set(urls) == {
         '/assets/styles-2.css',
         '/assets/tile-1.jpg',
+        '/assets/somefont.eot',
+        '/assets/somefont.ttf',
     }

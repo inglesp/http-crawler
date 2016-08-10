@@ -13,3 +13,11 @@ h1 {
     background-color: lightgreen;
   }
 }
+
+@font-face {
+  font-family: 'somefont';
+  src: url('/assets/somefont.eot');
+  src: url('/assets/somefont.eot') format('embedded-opentype'), url('/assets/somefont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

@@ -62,6 +62,10 @@ def extract_urls_from_css(css):
                 for token in rule.prelude:
                     if token.type in ['string', 'url']:
                         urls.append(token.value)
+            elif rule.lower_at_keyword == 'font-face':
+                for token in rule.content:
+                    if token.type == 'url':
+                        urls.append(token.value)
         elif rule.type == 'qualified-rule':
             for token in rule.content:
                 if token.type == 'url':
