@@ -3,7 +3,7 @@ from urllib.parse import urljoin, urlparse
 
 import lxml.html
 import requests
-import tinycss
+import tinycss2
 
 
 __version__ = '0.1.2.dev'
@@ -55,15 +55,16 @@ def extract_urls_from_html(html):
 
 def extract_urls_from_css(css):
     urls = []
-    parser = tinycss.make_parser()
-    stylesheet = parser.parse_stylesheet(css)
-    for rule in stylesheet.rules:
-        if rule.at_keyword is None:
-            for declaration in rule.declarations:
-                for token in declaration.value:
-                    if token.type == 'URI':
+    rules = tinycss2.parse_stylesheet(css)
+    for rule in rules:
+        if rule.type == 'at-rule':
+            if rule.lower_at_keyword == 'import':
+                for token in rule.prelude:
+                    if token.type in ['string', 'url']:
                         urls.append(token.value)
-        elif rule.at_keyword == '@import':
-            urls.append(rule.uri)
+        elif rule.type == 'qualified-rule':
+            for token in rule.content:
+                if token.type == 'url':
+                    urls.append(token.value)
 
     return urls

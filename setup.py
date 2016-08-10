@@ -23,7 +23,7 @@ if __name__ == '__main__':
         long_description=read('README.rst'),
         packages=find_packages(where='src'),
         package_dir={'': 'src'},
-        install_requires=['lxml', 'requests', 'tinycss'],
+        install_requires=['lxml', 'requests', 'tinycss2'],
         url='http://github.com/inglesp/http-crawler',
         author='Peter Inglesby',
         author_email='peter.inglesby@gmail.com',
