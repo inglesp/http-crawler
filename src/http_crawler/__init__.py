@@ -6,7 +6,7 @@ import requests
 import tinycss
 
 
-__version__ = '0.1.1'
+__version__ = '0.1.2.dev'
 
 
 def crawl(base_url, follow_external_links=True):
