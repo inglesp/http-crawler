@@ -16,14 +16,28 @@ def serve():
 
     serving = True
 
+    class HTTPHandler(SimpleHTTPRequestHandler):
+        def do_GET(self):
+            path = self.path.split('/')
+            if path[-2] == 'redirect-old-path':
+                path[-2] = 'redirect-new-path'
+                newpath = '/'.join(path)
+                self.send_response(301)
+                self.send_header('Location', newpath)
+                self.send_header('content-type', 'text/html')
+                self.end_headers()
+            else:
+                return super(HTTPHandler, self).do_GET()
+
     def _serve(dir, port):
         base_dir = os.path.join('tests', dir)
         os.chdir(base_dir)
-        server = HTTPServer(('', port), SimpleHTTPRequestHandler)
+        server = HTTPServer(('', port), HTTPHandler)
         server.serve_forever()
 
     Process(target=_serve, args=('site', 8000), daemon=True).start()
     Process(target=_serve, args=('external-site', 8001), daemon=True).start()
+    Process(target=_serve, args=('redirect-site', 8002), daemon=True).start()
 
 
 def test_crawl():
@@ -112,3 +126,30 @@ def test_extract_urls_from_css():
         '/assets/somefont.eot',
         '/assets/somefont.ttf',
     }
+
+
+def test_with_redirect():
+    serve()
+
+    rsps = list(http_crawler.crawl('http://localhost:8002/'))
+    actual_urls = set([resp.url for resp in rsps])
+    expected_urls = set([
+        'http://localhost:8002/',
+        'http://localhost:8002/redirect-new-path/page-2.html',
+        'http://localhost:8002/redirect-new-path/page-1.html'
+    ])
+
+    assert actual_urls == expected_urls
+
+
+def test_without_redirect():
+    serve()
+
+    rsps = list(http_crawler.crawl('http://localhost:8002/',
+                                   follow_redirects=False))
+    actual_urls = set([resp.url for resp in rsps])
+    expected_urls = set([
+        'http://localhost:8002/',
+    ])
+
+    assert actual_urls == expected_urls
