@@ -33,6 +33,13 @@ For instance, this is how you would use ``crawl`` to find and log any broken lin
     >>>         print('Got {} at {}'.format(rsp.status_code, rsp.url))
 
 
+``crawl`` has a number of options:
+
+- ``follow_external_links`` (default ``True``)  If set, ``crawl`` will make a request for every URL it encounters, including ones with a different domain to the original URL.  If not set, ``crawl`` will ignore all URLs that have a different domain to the original URL.  In either case, ``crawl`` will not extract further URLs from a page with a different domain to the original URL.
+
+- ``ignore_fragments`` (default ``True``)  If set, ``crawl`` will ignore the fragment part of any URL.  This means that if ``crawl`` encounters ``http://domain/path#anchor``, it will make a request for ``http://domain/path``.  Moreover, it means that if ``crawl`` encounters ``http://domain/path#anchor1`` and ``http://domain/path#anchor2``, it will only make one request.
+
+
 Motivation
 ~~~~~~~~~~
 
