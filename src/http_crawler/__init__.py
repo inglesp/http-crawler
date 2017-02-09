@@ -19,7 +19,6 @@ def crawl(base_url, follow_external_links=True, ignore_fragments=True):
 
     while todo:
         url = todo.pop()
-        print('getting', url)
         rsp = session.get(url)
 
         yield rsp
