@@ -1,5 +1,5 @@
 import cgi
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urldefrag, urljoin, urlparse
 
 import lxml.html
 import requests
@@ -9,7 +9,7 @@ import tinycss2
 __version__ = '0.1.2'
 
 
-def crawl(base_url, follow_external_links=True):
+def crawl(base_url, follow_external_links=True, ignore_fragments=True):
     base_netloc = urlparse(base_url).netloc
 
     seen = set([base_url])
@@ -19,6 +19,7 @@ def crawl(base_url, follow_external_links=True):
 
     while todo:
         url = todo.pop()
+        print('getting', url)
         rsp = session.get(url)
 
         yield rsp
@@ -38,6 +39,9 @@ def crawl(base_url, follow_external_links=True):
 
         for url1 in urls:
             abs_url = urljoin(url, url1)
+
+            if ignore_fragments:
+                abs_url = urldefrag(abs_url)[0]
 
             if not follow_external_links:
                 if urlparse(abs_url).netloc != base_netloc:
