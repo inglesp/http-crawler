@@ -89,10 +89,10 @@ def test_extract_urls_from_html():
     assert len(urls) == 8
     assert set(urls) == {
         '/',
-        'http://localhost:8000/pages/page-1',
-        'http://localhost:8001/pages/page-1',
-        '/pages/page-2',
-        'pages/page-3',
+        'http://localhost:8000/pages/page-1/',
+        'http://localhost:8001/pages/page-1/',
+        '/pages/page-2/',
+        'pages/page-3/',
         '/assets/styles.css',
         '/assets/image.jpg',
         '/assets/script.js',
