@@ -9,6 +9,7 @@ def read(*parts):
     with open(os.path.join(here, *parts)) as f:
         return f.read()
 
+
 VERSION = re.search(
     "^__version__ = '(.*)'$",
     read('src', 'http_crawler', '__init__.py'),
