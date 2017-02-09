@@ -1,7 +1,14 @@
 language: python
 python:
-  - "3.5"
+- '3.5'
 install:
-  - pip install tox
+- pip install tox
 script:
-  - tox
+- tox
+deploy:
+  provider: pypi
+  on:
+    tags: true
+  user: inglesp
+  password:
+    secure: LnrN+9vF8Ns2y4OA5sJ87IkLn022Nd7+DxdDlWB+M82Sb3QrGe2LSc7kORDcaNA3etd8ezFurLcpH7KiOzGpNj0quMqRosu9UctKSkCTcA6QBvL4+5ugQNl72uXDivGi1nwc75wZtm9Q6Ib4DDi3XZ7tz6b2+GePnQXWVgr7rwGXom3KCLibtlw6CvxqkvjM8UBcH18WAvdheboth1isaxrcovUjJ1MM1WEPrA8FiPbvyLBjK5lxbjRcp1TUd7jTqkac2mVqW6gjfUV2gTBdjx9dxl7CJfcszFi0+gN9+ErlB6W2KD86LT7s39pw4oqWK4+JaHh+T2AiKeJRYUSdCS1JrHHMNgzrKlI+vS/OTy8SfZ+GsOBKhnZ5EfLjQUSUpHxh3essiNecUKcL+z7sayyhxr0c4CJwXRwCTx4p7YXXLoaUrmcBdIv+ovwWCBo/wqH66sCWDqP7SjXQL5+nsze3NstYp/clbJosZwgSqaEMJ+wkGiJ6B9nFxqRi3EWSXq5sUVZgfZiCKrMbX6ZVJg4tKi3+jrggP//rrcAhHJvbgfMEBi1IRdi6cfQYzD0XehgapNbTCXHewD9rDYlckkKokmyujbhdhuE9wL8c287GL1S2bnyuoUF+UroXpu+9BXi6vBy09JgnOVIR9iQh8y7W9NJ5Lvo0CDdeo49TktQ=
