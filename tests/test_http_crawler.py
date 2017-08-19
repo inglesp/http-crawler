@@ -118,7 +118,7 @@ def test_extract_urls_from_html():
 
     urls = http_crawler.extract_urls_from_html(content)
 
-    assert len(urls) == 12
+    assert len(urls) == 13
     assert set(urls) == {
         '/',
         'http://localhost:8000/pages/page-1/',
@@ -132,6 +132,7 @@ def test_extract_urls_from_html():
         '/assets/styles.css',
         '/assets/image.jpg',
         '/assets/script.js',
+        'mailto:example@example.org',
     }
 
 
