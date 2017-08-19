@@ -31,7 +31,7 @@ def test_crawl():
 
     rsps = list(http_crawler.crawl('http://localhost:8000/'))
 
-    assert len(rsps) == 13
+    assert len(rsps) == 14
 
     urls = [rsp.url for rsp in rsps]
 
@@ -41,6 +41,7 @@ def test_crawl():
         'http://localhost:8000/pages/page-1/',
         'http://localhost:8000/pages/page-2/',
         'http://localhost:8000/pages/page-3/',
+        'mailto:example@example.org',
         'http://localhost:8000/assets/styles.css',
         'http://localhost:8000/assets/styles-2.css',
         'http://localhost:8000/assets/image.jpg',
@@ -59,7 +60,7 @@ def test_crawl_follow_external_links_false():
     rsps = list(http_crawler.crawl('http://localhost:8000/',
                 follow_external_links=False))
 
-    assert len(rsps) == 12
+    assert len(rsps) == 13
 
     urls = [rsp.url for rsp in rsps]
 
@@ -69,6 +70,7 @@ def test_crawl_follow_external_links_false():
         'http://localhost:8000/pages/page-1/',
         'http://localhost:8000/pages/page-2/',
         'http://localhost:8000/pages/page-3/',
+        'mailto:example@example.org',
         'http://localhost:8000/assets/styles.css',
         'http://localhost:8000/assets/styles-2.css',
         'http://localhost:8000/assets/image.jpg',
@@ -99,6 +101,7 @@ def test_crawl_ignore_fragments_false():
         'http://localhost:8000/pages/page-2/#anchor',
         'http://localhost:8000/pages/page-3/',
         'http://localhost:8000/pages/page-3/#anchor',
+        'mailto:example@example.org',
         'http://localhost:8000/assets/styles.css',
         'http://localhost:8000/assets/styles-2.css',
         'http://localhost:8000/assets/image.jpg',
@@ -118,13 +121,14 @@ def test_extract_urls_from_html():
 
     urls = http_crawler.extract_urls_from_html(content)
 
-    assert len(urls) == 12
+    assert len(urls) == 13
     assert set(urls) == {
         '/',
         'http://localhost:8000/pages/page-1/',
         'http://localhost:8000/pages/page-1/#anchor',
         'http://localhost:8001/pages/page-1/',
         'http://localhost:8001/pages/page-1/#anchor',
+        'mailto:example@example.org',
         '/pages/page-2/',
         '/pages/page-2/#anchor',
         'pages/page-3/',
