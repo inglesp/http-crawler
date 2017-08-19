@@ -19,7 +19,13 @@ def crawl(base_url, follow_external_links=True, ignore_fragments=True):
 
     while todo:
         url = todo.pop()
-        rsp = session.get(url)
+
+        try:
+            rsp = session.get(url)
+        except requests.exceptions.InvalidSchema:
+            # TODO: Check if the scheme is a valid one, or otherwise
+            # communicate the error to the user.
+            continue
 
         yield rsp
 
