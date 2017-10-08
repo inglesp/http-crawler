@@ -16,6 +16,11 @@ matrix:
     - python: 3.5
       env: TOXENV=flake8
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - .tox
+
 script:
 - tox
 deploy:
