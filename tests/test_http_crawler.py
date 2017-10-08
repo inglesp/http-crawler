@@ -1,4 +1,9 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+try:
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+except ImportError:  # Python 2
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+
 import os
 from multiprocessing import Process
 
