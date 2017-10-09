@@ -1,6 +1,11 @@
 Release History
 ===============
 
+0.2.0 (2017-10-09)
+******************
+
+This release has no changes to the public API, but adds support for Python 2.7 and Python 3.4 to 3.6.
+
 0.1.6 (2017-08-19)
 ******************
 
