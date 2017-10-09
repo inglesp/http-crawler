@@ -1,5 +1,9 @@
 import cgi
-from urllib.parse import urldefrag, urljoin, urlparse
+
+try:
+    from urllib.parse import urldefrag, urljoin, urlparse
+except ImportError:  # Python 2
+    from urlparse import urldefrag, urljoin, urlparse
 
 import lxml.html
 import requests

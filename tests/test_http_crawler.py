@@ -1,4 +1,9 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
+try:
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+except ImportError:  # Python 2
+    from SimpleHTTPServer import SimpleHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
+
 import os
 from multiprocessing import Process
 
@@ -22,8 +27,13 @@ def serve():
         server = HTTPServer(('', port), SimpleHTTPRequestHandler)
         server.serve_forever()
 
-    Process(target=_serve, args=('site', 8000), daemon=True).start()
-    Process(target=_serve, args=('external-site', 8001), daemon=True).start()
+    proc_site = Process(target=_serve, args=('site', 8000))
+    proc_site.daemon = True
+    proc_site.start()
+
+    proc_external_site = Process(target=_serve, args=('external-site', 8001))
+    proc_external_site.daemon = True
+    proc_external_site.start()
 
 
 def test_crawl():
