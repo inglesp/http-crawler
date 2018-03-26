@@ -1,4 +1,9 @@
 try:
+    import ssl
+except ImportError:
+    ssl = None
+
+try:
     from http.server import SimpleHTTPRequestHandler, HTTPServer
 except ImportError:  # Python 2
     from SimpleHTTPServer import SimpleHTTPRequestHandler
@@ -9,14 +14,13 @@ from multiprocessing import Process
 
 import http_crawler
 
-
 serving = False
 
 
-def serve():
+def serve(use_ssl=False):
     global serving
 
-    if serving:
+    if serving and not use_ssl:
         return
 
     serving = True
@@ -25,13 +29,20 @@ def serve():
         base_dir = os.path.join('tests', dir)
         os.chdir(base_dir)
         server = HTTPServer(('', port), SimpleHTTPRequestHandler)
+        if use_ssl:
+            server.socket = ssl.wrap_socket(server.socket,
+                                            server_side=True,
+                                            certfile='cert.pem',
+                                            ssl_version=ssl.PROTOCOL_TLS)
         server.serve_forever()
 
-    proc_site = Process(target=_serve, args=('site', 8000))
+    port = 8000 if not use_ssl else 8443
+    proc_site = Process(target=_serve, args=('site', port))
     proc_site.daemon = True
     proc_site.start()
 
-    proc_external_site = Process(target=_serve, args=('external-site', 8001))
+    external_port = 8001 if not use_ssl else 8444
+    proc_external_site = Process(target=_serve, args=('external-site', external_port))
     proc_external_site.daemon = True
     proc_external_site.start()
 
@@ -67,7 +78,7 @@ def test_crawl_follow_external_links_false():
     serve()
 
     rsps = list(http_crawler.crawl('http://localhost:8000/',
-                follow_external_links=False))
+                                   follow_external_links=False))
 
     assert len(rsps) == 12
 
@@ -94,7 +105,7 @@ def test_crawl_ignore_fragments_false():
     serve()
 
     rsps = list(http_crawler.crawl('http://localhost:8000/',
-                ignore_fragments=False))
+                                   ignore_fragments=False))
 
     # assert len(rsps) == 14
 
@@ -159,3 +170,31 @@ def test_extract_urls_from_css():
         '/assets/somefont.eot',
         '/assets/somefont.ttf',
     }
+
+
+if ssl and os.path.exists('cert.pem'):
+    def test_ssl_verify():
+        serve(use_ssl=True)
+
+        rsps = list(http_crawler.crawl('https://localhost:8443', verify=False))
+
+        assert len(rsps) == 13
+
+        urls = [rsp.url for rsp in rsps]
+
+        assert len(urls) == len(set(urls))
+        assert set(urls) == {
+            'https://localhost:8443/',
+            'https://localhost:8443/pages/page-1/',
+            'https://localhost:8443/pages/page-2/',
+            'https://localhost:8443/pages/page-3/',
+            'https://localhost:8443/assets/styles.css',
+            'https://localhost:8443/assets/styles-2.css',
+            'https://localhost:8443/assets/image.jpg',
+            'https://localhost:8443/assets/script.js',
+            'https://localhost:8443/assets/tile-1.jpg',
+            'https://localhost:8443/assets/tile-2.jpg',
+            'https://localhost:8443/assets/somefont.eot',
+            'https://localhost:8443/assets/somefont.ttf',
+            'https://localhost:8001/pages/page-1/',
+        }
