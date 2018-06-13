@@ -1,7 +1,3 @@
-try:
-    import ssl
-except ImportError:
-    ssl = None
 
 try:
     from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -10,41 +6,51 @@ except ImportError:  # Python 2
     from BaseHTTPServer import HTTPServer
 
 import os
+import ssl
 from multiprocessing import Process
+
+import urllib3
+from requests.exceptions import SSLError
 
 import http_crawler
 
 serving = False
 
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def serve(use_ssl=False):
+
+def serve():
     global serving
 
-    if serving and not use_ssl:
+    if serving:
         return
 
     serving = True
 
-    def _serve(dir, port):
+    def _serve(dir, port, bad_ssl_cert=False):
         base_dir = os.path.join('tests', dir)
         os.chdir(base_dir)
         server = HTTPServer(('', port), SimpleHTTPRequestHandler)
-        if use_ssl:
+        if bad_ssl_cert:
             server.socket = ssl.wrap_socket(server.socket,
                                             server_side=True,
-                                            certfile='cert.pem',
+                                            certfile=os.path.join(
+                                                '..', 'cert.pem'
+                                            ),
                                             ssl_version=ssl.PROTOCOL_TLS)
         server.serve_forever()
 
-    port = 8000 if not use_ssl else 8443
-    proc_site = Process(target=_serve, args=('site', port))
+    proc_site = Process(target=_serve, args=('site', 8000))
     proc_site.daemon = True
     proc_site.start()
 
-    external_port = 8001 if not use_ssl else 8444
-    proc_external_site = Process(target=_serve, args=('external-site', external_port))
+    proc_external_site = Process(target=_serve, args=('external-site', 8001))
     proc_external_site.daemon = True
     proc_external_site.start()
+
+    proc_bad_ssl = Process(target=_serve, args=('one-page-site', 8002, True))
+    proc_bad_ssl.daemon = True
+    proc_bad_ssl.start()
 
 
 def test_crawl():
@@ -172,29 +178,20 @@ def test_extract_urls_from_css():
     }
 
 
-if ssl and os.path.exists('cert.pem'):
-    def test_ssl_verify():
-        serve(use_ssl=True)
+def test_ssl_verify_false():
+    serve()
 
-        rsps = list(http_crawler.crawl('https://localhost:8443', verify=False))
+    rsps = list(http_crawler.crawl('https://localhost:8002', verify=False))
 
-        assert len(rsps) == 13
+    assert len(rsps) == 1
 
-        urls = [rsp.url for rsp in rsps]
 
-        assert len(urls) == len(set(urls))
-        assert set(urls) == {
-            'https://localhost:8443/',
-            'https://localhost:8443/pages/page-1/',
-            'https://localhost:8443/pages/page-2/',
-            'https://localhost:8443/pages/page-3/',
-            'https://localhost:8443/assets/styles.css',
-            'https://localhost:8443/assets/styles-2.css',
-            'https://localhost:8443/assets/image.jpg',
-            'https://localhost:8443/assets/script.js',
-            'https://localhost:8443/assets/tile-1.jpg',
-            'https://localhost:8443/assets/tile-2.jpg',
-            'https://localhost:8443/assets/somefont.eot',
-            'https://localhost:8443/assets/somefont.ttf',
-            'https://localhost:8001/pages/page-1/',
-        }
+def test_ssl_verify_true():
+    serve()
+
+    e = None
+    try:
+        list(http_crawler.crawl('https://localhost:8002', verify=True))
+    except SSLError:
+        e = True
+    assert e
