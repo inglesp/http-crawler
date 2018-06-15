@@ -1,3 +1,4 @@
+import pytest
 
 try:
     from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -189,9 +190,5 @@ def test_ssl_verify_false():
 def test_ssl_verify_true():
     serve()
 
-    e = None
-    try:
+    with pytest.raises(SSLError):
         list(http_crawler.crawl('https://localhost:8002', verify=True))
-    except SSLError:
-        e = True
-    assert e
