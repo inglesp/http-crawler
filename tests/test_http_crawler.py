@@ -36,9 +36,8 @@ def serve():
             server.socket = ssl.wrap_socket(server.socket,
                                             server_side=True,
                                             certfile=os.path.join(
-                                                '..', 'cert.pem'
-                                            ),
-                                            ssl_version=ssl.PROTOCOL_TLS)
+                                                '..', 'cert.pem')
+                                            )
         server.serve_forever()
 
     proc_site = Process(target=_serve, args=('site', 8000))
