@@ -39,6 +39,8 @@ For instance, this is how you would use ``crawl`` to find and log any broken lin
 
 - ``ignore_fragments`` (default ``True``)  If set, ``crawl`` will ignore the fragment part of any URL.  This means that if ``crawl`` encounters ``http://domain/path#anchor``, it will make a request for ``http://domain/path``.  Moreover, it means that if ``crawl`` encounters ``http://domain/path#anchor1`` and ``http://domain/path#anchor2``, it will only make one request.
 
+- ``verify`` (default ``True``)  This option controls the behaviour of SSL certificate verification.  See the `requests documentation`_ for more details.
+
 
 Motivation
 ~~~~~~~~~~
@@ -73,3 +75,4 @@ To run the tests:
 .. _`GitHub's guide`: https://help.github.com/articles/using-pull-requests/
 .. _`PEP 8`: https://www.python.org/dev/peps/pep-0008/
 .. _tox: https://tox.readthedocs.io/en/latest/
+.. _`requests documentation`: http://docs.python-requests.org/en/master/user/advanced/#ssl-cert-verification
