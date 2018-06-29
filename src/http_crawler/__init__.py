@@ -13,13 +13,15 @@ import tinycss2
 __version__ = '0.2.0'
 
 
-def crawl(base_url, follow_external_links=True, ignore_fragments=True):
+def crawl(base_url, follow_external_links=True, ignore_fragments=True,
+          verify=True):
     base_netloc = urlparse(base_url).netloc
 
     seen = set([base_url])
     todo = [base_url]
 
     session = requests.Session()
+    session.verify = verify
 
     while todo:
         url = todo.pop()

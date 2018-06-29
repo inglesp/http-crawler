@@ -1,3 +1,5 @@
+import pytest
+
 try:
     from http.server import SimpleHTTPRequestHandler, HTTPServer
 except ImportError:  # Python 2
@@ -5,12 +7,17 @@ except ImportError:  # Python 2
     from BaseHTTPServer import HTTPServer
 
 import os
+import ssl
 from multiprocessing import Process
+
+import urllib3
+from requests.exceptions import SSLError
 
 import http_crawler
 
-
 serving = False
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def serve():
@@ -21,10 +28,16 @@ def serve():
 
     serving = True
 
-    def _serve(dir, port):
+    def _serve(dir, port, bad_ssl_cert=False):
         base_dir = os.path.join('tests', dir)
         os.chdir(base_dir)
         server = HTTPServer(('', port), SimpleHTTPRequestHandler)
+        if bad_ssl_cert:
+            server.socket = ssl.wrap_socket(server.socket,
+                                            server_side=True,
+                                            certfile=os.path.join(
+                                                '..', 'cert.pem')
+                                            )
         server.serve_forever()
 
     proc_site = Process(target=_serve, args=('site', 8000))
@@ -34,6 +47,10 @@ def serve():
     proc_external_site = Process(target=_serve, args=('external-site', 8001))
     proc_external_site.daemon = True
     proc_external_site.start()
+
+    proc_bad_ssl = Process(target=_serve, args=('one-page-site', 8002, True))
+    proc_bad_ssl.daemon = True
+    proc_bad_ssl.start()
 
 
 def test_crawl():
@@ -67,7 +84,7 @@ def test_crawl_follow_external_links_false():
     serve()
 
     rsps = list(http_crawler.crawl('http://localhost:8000/',
-                follow_external_links=False))
+                                   follow_external_links=False))
 
     assert len(rsps) == 12
 
@@ -94,7 +111,7 @@ def test_crawl_ignore_fragments_false():
     serve()
 
     rsps = list(http_crawler.crawl('http://localhost:8000/',
-                ignore_fragments=False))
+                                   ignore_fragments=False))
 
     # assert len(rsps) == 14
 
@@ -159,3 +176,18 @@ def test_extract_urls_from_css():
         '/assets/somefont.eot',
         '/assets/somefont.ttf',
     }
+
+
+def test_ssl_verify_false():
+    serve()
+
+    rsps = list(http_crawler.crawl('https://localhost:8002', verify=False))
+
+    assert len(rsps) == 1
+
+
+def test_ssl_verify_true():
+    serve()
+
+    with pytest.raises(SSLError):
+        list(http_crawler.crawl('https://localhost:8002', verify=True))
